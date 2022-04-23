@@ -31,13 +31,14 @@ public class SootCallGraphTest {
         }));
 
 
-        PackManager.v().getPack("wjtp").add(new Transform("wjtp.myTrans", new SceneTransformer() {
+        PackManager.v().getPack("wjtp").add(new Transform("wjtp.getCallGraph", new SceneTransformer() {
             @Override
             protected void internalTransform(String phaseName, Map options) {
                 CHATransformer.v().transform();
 
                 CallGraph cg = Scene.v().getCallGraph();
-                System.out.println(cg);
+//                System.out.println(cg);
+                System.out.printf("get callgraph success.  len : %d",cg.size());
             }
 
         }));
