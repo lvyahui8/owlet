@@ -1,9 +1,8 @@
 package io.github.lvyahui8.owlet.graph;
 
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 public class Graph {
-    Map<String,Node> nodeMap;
-    List<Node> roots;
+    Set<Node> nodes;
+    Set<Node> roots;
 }
