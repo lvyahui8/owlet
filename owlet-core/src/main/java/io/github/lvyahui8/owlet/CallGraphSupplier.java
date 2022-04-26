@@ -1,4 +1,4 @@
-package io.github.lvyahui8.owlet.graph;
+package io.github.lvyahui8.owlet;
 
 import io.github.lvyahui8.owlet.utils.JavaUtils;
 import soot.PackManager;

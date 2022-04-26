@@ -3,7 +3,7 @@ package io.github.lvyahui8.owlet.cmd;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import io.github.lvyahui8.owlet.Analyser;
-import io.github.lvyahui8.owlet.graph.CallGraphSupplier;
+import io.github.lvyahui8.owlet.CallGraphSupplier;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
