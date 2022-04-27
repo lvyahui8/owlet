@@ -79,5 +79,7 @@ public class CallGraphSupplier implements Supplier<CallGraph> {
         CallGraphSupplier supplier = new CallGraphSupplier(classpath);
         supplier.load();
         System.out.println("graph size : "  + supplier.getCallGraph().size());
+        // to mappedBuffer
+
     }
 }

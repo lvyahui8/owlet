@@ -1,10 +1,13 @@
 package io.github.lvyahui8.owlet.graph;
 
+import lombok.Data;
 import soot.MethodOrMethodContext;
 
+import java.io.Serializable;
 import java.util.Set;
 
-public class Node {
+@Data
+public class Node implements Serializable {
     MethodOrMethodContext method;
 
     Set<Node> edgeOuts;
@@ -16,6 +19,9 @@ public class Node {
 
     @Override
     public int hashCode() {
+        if (method == null) {
+            return 0;
+        }
         return method.hashCode();
     }
 
