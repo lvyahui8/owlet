@@ -26,7 +26,18 @@ public class GraphSerializer {
         }
     }
 
-    public void deserialize() {
-
+    public Graph deserialize(File sourceFile) throws IOException {
+        RandomAccessFile raf = new RandomAccessFile(sourceFile, "r");
+        FileChannel channel = raf.getChannel();
+        byte[] results = new byte[(int) sourceFile.length()];
+        try {
+            MappedByteBuffer mbb = channel.map(FileChannel.MapMode.READ_ONLY, 0, sourceFile.length());
+            mbb.get(results);
+        } finally {
+            channel.close();
+        }
+        FSTConfiguration conf = FSTConfiguration.createDefaultConfiguration();
+        Object object = conf.asObject(results);
+        return (Graph) object;
     }
 }

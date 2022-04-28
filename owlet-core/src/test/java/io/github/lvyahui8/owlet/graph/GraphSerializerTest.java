@@ -1,6 +1,7 @@
 package io.github.lvyahui8.owlet.graph;
 
 import junit.framework.TestCase;
+import org.junit.Assert;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,5 +16,12 @@ public class GraphSerializerTest extends TestCase {
         graph.nodes.add(new Node(null));
         GraphSerializer serializer = new GraphSerializer();
         serializer.serialize(graph,graphFile);
+    }
+
+    public void testDeserialize() throws IOException {
+        GraphSerializer serializer = new GraphSerializer();
+        Graph graph = serializer.deserialize(graphFile);
+        Assert.assertNotNull(graph);
+        System.out.println(graph);
     }
 }
