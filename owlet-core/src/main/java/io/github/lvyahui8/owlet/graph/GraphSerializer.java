@@ -1,5 +1,6 @@
 package io.github.lvyahui8.owlet.graph;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.nustaq.serialization.FSTConfiguration;
 
 import java.io.File;
@@ -39,5 +40,10 @@ public class GraphSerializer {
         FSTConfiguration conf = FSTConfiguration.createDefaultConfiguration();
         Object object = conf.asObject(results);
         return (Graph) object;
+    }
+
+    public static File GetGraphFile(String classpath) {
+        String path = System.getProperty("java.io.tmpdir");
+        return new File(path + File.separator + DigestUtils.md5Hex(classpath).toLowerCase() + ".gf");
     }
 }

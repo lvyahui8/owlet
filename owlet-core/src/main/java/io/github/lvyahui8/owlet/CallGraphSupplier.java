@@ -1,5 +1,8 @@
 package io.github.lvyahui8.owlet;
 
+import io.github.lvyahui8.owlet.graph.Graph;
+import io.github.lvyahui8.owlet.graph.GraphConverter;
+import io.github.lvyahui8.owlet.graph.GraphSerializer;
 import io.github.lvyahui8.owlet.utils.JavaUtils;
 import soot.PackManager;
 import soot.Scene;
@@ -8,18 +11,15 @@ import soot.Transform;
 import soot.jimple.toolkits.callgraph.CHATransformer;
 import soot.jimple.toolkits.callgraph.CallGraph;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class CallGraphSupplier implements Supplier<CallGraph> {
+public class CallGraphSupplier implements Supplier<Graph> {
     String classpath;
-    CallGraph callGraph;
+    Graph callGraph;
 
     public CallGraphSupplier(String classpath) {
         this.classpath = classpath;
@@ -38,7 +38,9 @@ public class CallGraphSupplier implements Supplier<CallGraph> {
             @Override
             protected void internalTransform(String phaseName, Map options) {
                 CHATransformer.v().transform();
-                callGraph = Scene.v().getCallGraph();
+                CallGraph cg = Scene.v().getCallGraph();
+                GraphConverter converter = new GraphConverter();
+                callGraph = converter.convert(cg);
             }
         }));
 
@@ -51,7 +53,7 @@ public class CallGraphSupplier implements Supplier<CallGraph> {
 
     }
 
-    public CallGraph getCallGraph() {
+    public Graph getCallGraph() {
         if (callGraph == null) {
             Process process = JavaUtils.forkJavaProcess(this.getClass(), Collections.singletonList(classpath));
             InputStream stdout = process.getInputStream();
@@ -64,22 +66,32 @@ public class CallGraphSupplier implements Supplier<CallGraph> {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            GraphSerializer serializer = new GraphSerializer();
+            File file = GraphSerializer.GetGraphFile(classpath);
+            try {
+                callGraph = serializer.deserialize(file);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                file.delete();
+            }
+
         }
         return callGraph;
     }
 
     @Override
-    public CallGraph get() {
+    public Graph get() {
         return getCallGraph();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         String classpath = args[0];
 
         CallGraphSupplier supplier = new CallGraphSupplier(classpath);
         supplier.load();
-        System.out.println("graph size : "  + supplier.getCallGraph().size());
-        // to mappedBuffer
-
+        GraphSerializer serializer = new GraphSerializer();
+        GraphConverter converter = new GraphConverter();
+        serializer.serialize(supplier.getCallGraph(),GraphSerializer.GetGraphFile(classpath));
     }
 }
