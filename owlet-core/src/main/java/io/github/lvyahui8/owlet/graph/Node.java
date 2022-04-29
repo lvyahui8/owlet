@@ -22,7 +22,7 @@ public class Node implements Serializable {
         if (method == null) {
             return 0;
         }
-        return method.hashCode();
+        return method.method().equivHashCode();
     }
 
     @Override
