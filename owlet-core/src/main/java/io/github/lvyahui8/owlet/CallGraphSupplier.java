@@ -91,7 +91,6 @@ public class CallGraphSupplier implements Supplier<Graph> {
         CallGraphSupplier supplier = new CallGraphSupplier(classpath);
         supplier.load();
         GraphSerializer serializer = new GraphSerializer();
-        GraphConverter converter = new GraphConverter();
         serializer.serialize(supplier.getCallGraph(),GraphSerializer.GetGraphFile(classpath));
     }
 }
