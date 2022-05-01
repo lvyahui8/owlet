@@ -16,8 +16,10 @@ public class MethodNode implements Serializable {
 
     List<String> paramTypeList = new LinkedList<>();
 
-    Map<String,MethodNode> callerMap = new HashMap<>();
-    Map<String,MethodNode> calleeMap = new HashMap<>();
+
+    Set<String> callers = new HashSet<>();
+
+    Set<String> callees = new HashSet<>();
 
     public MethodNode() {
     }

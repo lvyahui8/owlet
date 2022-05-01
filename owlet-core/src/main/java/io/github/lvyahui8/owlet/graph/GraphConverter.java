@@ -15,8 +15,8 @@ public class GraphConverter {
             Edge edge = listener.next();
             MethodNode srcNode = findNode(graph,edge.getSrc());
             MethodNode tgtNode = findNode(graph,edge.getTgt());
-            srcNode.calleeMap.put(tgtNode.getKey(),tgtNode);
-            tgtNode.callerMap.put(srcNode.getKey(),srcNode);
+            srcNode.callees.add(tgtNode.getKey());
+            tgtNode.callers.add(srcNode.getKey());
         }
         return graph;
     }

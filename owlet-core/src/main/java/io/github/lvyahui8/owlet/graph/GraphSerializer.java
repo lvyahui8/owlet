@@ -43,7 +43,9 @@ public class GraphSerializer {
     }
 
     public static File GetGraphFile(String classpath) {
-        String path = System.getProperty("java.io.tmpdir");
+        String path = System.getProperty("java.io.tmpdir") + File.separator + "/owlet";
+        File dir = new File(path);
+        dir.mkdirs();
         return new File(path + File.separator + DigestUtils.md5Hex(classpath).toLowerCase() + ".gf");
     }
 }
