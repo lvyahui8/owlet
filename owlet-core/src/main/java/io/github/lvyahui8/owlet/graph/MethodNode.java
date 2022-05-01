@@ -26,7 +26,7 @@ public class MethodNode implements Serializable {
 
 
     public String getKey() {
-        return StringUtils.join(declareClassFullName,name,StringUtils.join(paramTypeList,"_"),"_");
+        return StringUtils.join(new Object[]{declareClassFullName,name,"(" + StringUtils.join(paramTypeList,"_") + ")"},"_");
     }
 
     @Override

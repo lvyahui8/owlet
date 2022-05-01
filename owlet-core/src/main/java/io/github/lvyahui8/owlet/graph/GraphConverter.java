@@ -27,7 +27,7 @@ public class GraphConverter {
         SootMethod m = method.method();
         MethodNode node = new MethodNode();
         node.setName(m.getName());
-        node.setDeclareClassFullName(m.getDeclaringClass().getJavaStyleName());
+        node.setDeclareClassFullName(m.getDeclaringClass().getName());
         for (Type type : m.getParameterTypes()) {
             node.getParamTypeList().add(type.toQuotedString());
         }
