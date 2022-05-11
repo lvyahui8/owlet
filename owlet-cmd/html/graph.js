@@ -167,6 +167,7 @@ const graph = new G6.TreeGraph({
     },
 });
 
+graph.setTextWaterMarker(['Owlet']);
 graph.data(data);
 graph.render();
 graph.fitView();
@@ -181,6 +182,8 @@ graph.on('node:click', (e) => {
 if (typeof window !== 'undefined')
     window.onresize = () => {
         if (!graph || graph.get('destroyed')) return;
-        if (!container || !container.scrollWidth || !container.scrollHeight) return;
-        graph.changeSize(container.scrollWidth, container.scrollHeight);
+        if (!container || !container.offsetWidth || !container.offsetHeight) return;
+        graph.changeSize(container.offsetWidth, container.offsetHeight);
+        graph.fitCenter();
     };
+
