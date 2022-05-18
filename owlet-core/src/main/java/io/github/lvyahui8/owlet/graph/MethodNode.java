@@ -12,10 +12,13 @@ public class MethodNode implements Serializable {
 
     String name;
 
+    String pkg;
+
     String declareClassFullName;
 
     List<String> paramTypeList = new LinkedList<>();
 
+    boolean javaLibMethod;
 
     Set<String> callers = new HashSet<>();
 

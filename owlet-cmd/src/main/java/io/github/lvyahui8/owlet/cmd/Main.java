@@ -24,8 +24,8 @@ public class Main {
         System.out.println("original:" + args.originalClasspath);
         System.out.println("changed:" + args.changedClasspath);
         ExecutorService pool = Executors.newFixedThreadPool(2);
-        CallGraphSupplier originalSupplier = new CallGraphSupplier(args.originalClasspath);
-        CallGraphSupplier changedSupplier = new CallGraphSupplier(args.changedClasspath);
+        CallGraphSupplier originalSupplier = new CallGraphSupplier(args.originalClasspath,args.keptPackages);
+        CallGraphSupplier changedSupplier = new CallGraphSupplier(args.changedClasspath,args.keptPackages);
         CompletableFuture<Void> allOf = CompletableFuture.allOf(
                 CompletableFuture.supplyAsync(originalSupplier,pool), CompletableFuture.supplyAsync(changedSupplier,pool));
         allOf.get();

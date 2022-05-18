@@ -1,8 +1,10 @@
 package io.github.lvyahui8.owlet;
 
+import com.beust.jcommander.JCommander;
 import io.github.lvyahui8.owlet.graph.Graph;
 import io.github.lvyahui8.owlet.graph.GraphConverter;
 import io.github.lvyahui8.owlet.graph.GraphSerializer;
+import io.github.lvyahui8.owlet.graph.MethodNode;
 import io.github.lvyahui8.owlet.utils.JavaUtils;
 import soot.PackManager;
 import soot.Scene;
@@ -12,17 +14,18 @@ import soot.jimple.toolkits.callgraph.CHATransformer;
 import soot.jimple.toolkits.callgraph.CallGraph;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 public class CallGraphSupplier implements Supplier<Graph> {
     String classpath;
     Graph callGraph;
 
-    public CallGraphSupplier(String classpath) {
+    Set<String> keptPackages;
+
+    public CallGraphSupplier(String classpath, Collection<String> keptPackages) {
         this.classpath = classpath;
+        this.keptPackages = new HashSet<>(keptPackages);
     }
 
     public void load(String classpath) {
@@ -53,9 +56,49 @@ public class CallGraphSupplier implements Supplier<Graph> {
 
     }
 
+    public Graph removeMeaninglessNode(Graph graph) {
+        // 删除无意义的节点
+        for (Iterator<Map.Entry<String, MethodNode>> it = graph.getNodeMap().entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<String, MethodNode> entry = it.next();
+            MethodNode m = entry.getValue();
+            if (m.isJavaLibMethod()) {
+                if (m.getCallees().isEmpty() && m.getCallers().isEmpty()) {
+                    it.remove();
+                }
+                if (! useful(m)) {
+                    it.remove();
+                }
+            }
+        }
+        return graph;
+    }
+
+    private boolean useful(MethodNode node) {
+        return useful(node.getCallees())  || useful(node.getCallers());
+    }
+
+    private boolean useful(Set<String> edges) {
+        for (String edgeKey : edges) {
+            for (String keptPackage : keptPackages) {
+                if (edgeKey.startsWith(keptPackage)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
     public Graph getCallGraph() {
         if (callGraph == null) {
-            Process process = JavaUtils.forkJavaProcess(this.getClass(), Collections.singletonList(classpath));
+            List<String> args = new LinkedList<>();
+            args.add("-cp");
+            args.add(classpath);
+            for (String keptPackage : keptPackages) {
+                args.add("-kps");
+                args.add(keptPackage);
+            }
+            Process process = JavaUtils.forkJavaProcess(this.getClass(),args);
             InputStream stdout = process.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(stdout));
             String line;
@@ -86,11 +129,12 @@ public class CallGraphSupplier implements Supplier<Graph> {
     }
 
     public static void main(String[] args) throws IOException {
-        String classpath = args[0];
-
-        CallGraphSupplier supplier = new CallGraphSupplier(classpath);
+        SupplierArgs supplierArgs = new SupplierArgs();
+        JCommander commander = JCommander.newBuilder().addObject(supplierArgs).build();
+        commander.parse(args);
+        CallGraphSupplier supplier = new CallGraphSupplier(supplierArgs.classpath,supplierArgs.keptPackages);
         supplier.load();
         GraphSerializer serializer = new GraphSerializer();
-        serializer.serialize(supplier.getCallGraph(),GraphSerializer.GetGraphFile(classpath));
+        serializer.serialize(supplier.getCallGraph(),GraphSerializer.GetGraphFile(supplierArgs.classpath));
     }
 }
