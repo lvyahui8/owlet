@@ -43,7 +43,7 @@ public class CallGraphSupplier implements Supplier<Graph> {
                 CHATransformer.v().transform();
                 CallGraph cg = Scene.v().getCallGraph();
                 GraphConverter converter = new GraphConverter();
-                callGraph = converter.convert(cg);
+                callGraph = removeMeaninglessNode(converter.convert(cg));
             }
         }));
 
