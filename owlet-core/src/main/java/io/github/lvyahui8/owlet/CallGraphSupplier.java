@@ -23,9 +23,15 @@ public class CallGraphSupplier implements Supplier<Graph> {
 
     Set<String> keptPackages;
 
+    List<String[]> keptPackagesList;
+
     public CallGraphSupplier(String classpath, Collection<String> keptPackages) {
         this.classpath = classpath;
         this.keptPackages = new HashSet<>(keptPackages);
+        this.keptPackagesList = new ArrayList<>(keptPackages.size());
+        for (String pkg : this.keptPackages) {
+            keptPackagesList.add(new String[]{pkg,pkg + ".",pkg + "_"});
+        }
     }
 
     public void load(String classpath) {
@@ -61,7 +67,7 @@ public class CallGraphSupplier implements Supplier<Graph> {
         for (Iterator<Map.Entry<String, MethodNode>> it = graph.getNodeMap().entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<String, MethodNode> entry = it.next();
             MethodNode m = entry.getValue();
-            if (m.isJavaLibMethod()) {
+            if (m.isJavaLibMethod() || !inKeptPackages(m.getPkg())) {
                 if (m.getCallees().isEmpty() && m.getCallers().isEmpty()) {
                     it.remove();
                 }
@@ -77,10 +83,19 @@ public class CallGraphSupplier implements Supplier<Graph> {
         return useful(node.getCallees())  || useful(node.getCallers());
     }
 
+    private boolean inKeptPackages(String pkg) {
+        for (String[] items : keptPackagesList) {
+            if (pkg.equals(items[0]) || pkg.startsWith(items[1])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean useful(Set<String> edges) {
         for (String edgeKey : edges) {
-            for (String keptPackage : keptPackages) {
-                if (edgeKey.startsWith(keptPackage)) {
+            for (String[] items : keptPackagesList) {
+                if (edgeKey.equals(items[1]) || edgeKey.startsWith(items[2])) {
                     return true;
                 }
             }
