@@ -1,13 +1,16 @@
 {
   "nodes" : [
     {
-      "id" : "a"
+      "id" : "a",
+      "pkg" : "org.lyh"
     },
     {
-      "id" : "b"
+      "id" : "b",
+      "pkg" : "org.lyh"
     },
     {
-      "id" : "c"
+      "id" : "c",
+      "pkg" : "org.feego"
     }
   ],
   "edges" : [

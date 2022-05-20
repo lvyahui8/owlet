@@ -38,7 +38,7 @@ G6.registerNode('card-node', {
                 x: -w / 2 + 8,
                 y: -h / 2 + 2,
                 lineHeight: 20,
-                text: cfg.id,
+                text: 'id',
                 fill: '#fff',
             },
             name: 'title',
@@ -63,7 +63,7 @@ G6.registerNode('card-node', {
                 x: -w / 2 + 8,
                 y: -h / 2 + 24,
                 lineHeight: 20,
-                text: 'description',
+                text: cfg.label || cfg.id,
                 fill: 'rgba(0,0,0, 1)',
             },
             name: `description`,
@@ -112,6 +112,26 @@ function createGraph(containerId,data) {
             return e;
         },
     });
+    const tooltip = new G6.Tooltip({
+        offsetX: 0,
+        offsetY: 0,
+        // the types of items that allow the tooltip show up
+        // 允许出现 tooltip 的 item 类型
+        itemTypes: ['node', 'edge'],
+        // custom the tooltip's content
+        // 自定义 tooltip 内容
+        getContent: (e) => {
+            const outDiv = document.createElement('div');
+            outDiv.style.width = 'fit-content';
+            //outDiv.style.padding = '0px 0px 20px 0px';
+            const node = e.item.getModel();
+            outDiv.innerHTML = `
+        <table><tbody>
+        <tr><td><b>Package:</b></td><td>${node.pkg}</td></tr>
+        </tbody></table>`;
+            return outDiv;
+        },
+    });
     const container = document.getElementById(containerId);
     const width =  defaultWidth;
     const height =  900;
@@ -120,7 +140,7 @@ function createGraph(containerId,data) {
         container: containerId,
         width,
         height,
-        plugins:[toolbar],
+        plugins:[toolbar,tooltip],
         modes: {
             default: ['drag-canvas',{type:'zoom-canvas'},  'click-select',],
         },

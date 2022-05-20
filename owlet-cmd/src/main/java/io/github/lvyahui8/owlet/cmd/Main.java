@@ -4,14 +4,16 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import io.github.lvyahui8.owlet.Analyser;
 import io.github.lvyahui8.owlet.CallGraphSupplier;
+import io.github.lvyahui8.owlet.graph.Graph;
 
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Main {
-    public static void main(String[] argv) throws ExecutionException, InterruptedException {
+    public static void main(String[] argv) throws ExecutionException, InterruptedException, IOException {
         Args args = new Args();
         JCommander commander = JCommander.newBuilder().addObject(args).build();
         try {
@@ -30,6 +32,9 @@ public class Main {
                 CompletableFuture.supplyAsync(originalSupplier,pool), CompletableFuture.supplyAsync(changedSupplier,pool));
         allOf.get();
         Analyser analyser = new Analyser();
-        analyser.compare(originalSupplier.getCallGraph(),changedSupplier.getCallGraph());
+        Graph diffGraph = analyser.compare(originalSupplier.getCallGraph(),changedSupplier.getCallGraph());
+        ResultHandler handler = new ResultHandler(originalSupplier.getCallGraph(), changedSupplier.getCallGraph(), diffGraph);
+        handler.output();
+        System.exit(0);
     }
 }
