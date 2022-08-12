@@ -133,8 +133,9 @@ function createGraph(containerId,data) {
         },
     });
     const container = document.getElementById(containerId);
-    const width =  defaultWidth;
-    const height =  900;
+    container.style.cssText="border:1px solid red;"
+    const width =  container.scrollWidth || defaultWidth;
+    const height =  700;
 
     const graph = new G6.Graph({
         container: containerId,
@@ -142,21 +143,22 @@ function createGraph(containerId,data) {
         height,
         plugins:[toolbar,tooltip],
         modes: {
-            default: ['drag-canvas',{type:'zoom-canvas'},  'click-select',],
+            default: ['drag-canvas','click-select',{type:'zoom-canvas'}, 'drag-node'],
         },
         defaultNode: {
             type: 'card-node',
             size: [100, 40],
         },
         defaultEdge: {
-            type: 'cubic-vertical',
+            type: 'cubic-horizontal',
             style: {
                 endArrow: true,
             },
         },
+        maxZoom: 1,
         layout: {
             type: 'dagre',
-            direction: 'TB',
+            rankdir :'LR',
             ranksep : 10,
             nodesep : 10,
         },
@@ -177,20 +179,4 @@ function createGraph(containerId,data) {
         };
 
 }
-
-
-$(document).ready(() => {
-    const firstCard = document.getElementById('source_graph');
-    defaultWidth = firstCard.scrollWidth;
-
-    $.getJSON('source.json',(data) => {
-        createGraph('source_graph',data);
-    });
-    $.getJSON('target.json',(data) => {
-        createGraph('target_graph',data);
-    });
-    $.getJSON('diff.json',(data) => {
-        createGraph('diff_graph',data);
-    });
-})
 

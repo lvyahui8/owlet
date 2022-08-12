@@ -36,33 +36,21 @@
             </tbody>
         </table>
     </table>
-    <h4>Diff Graph</h4>
     <div class="row">
         <div class="col-12">
             <div class="card card-primary card-tabs">
                 <div class="card-header p-0 pt-1">
                     <ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link active" id="custom-tabs-one-home-tab" data-toggle="pill" href="#custom-tabs-one-home" role="tab" aria-controls="custom-tabs-one-home" aria-selected="true">Source</a>
+                            <a class="nav-link active" id="custom-tabs-one-home-tab" data-toggle="pill" href="#custom-tabs-one-home" role="tab" aria-controls="custom-tabs-one-home" aria-selected="true">Diff</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="custom-tabs-one-profile-tab" data-toggle="pill" href="#custom-tabs-one-profile" role="tab" aria-controls="custom-tabs-one-profile" aria-selected="false">Target</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="custom-tabs-one-messages-tab" data-toggle="pill" href="#custom-tabs-one-messages" role="tab" aria-controls="custom-tabs-one-messages" aria-selected="false">Diff</a>
-                        </li>
+
                     </ul>
                 </div>
                 <div class="card-body">
                     <div class="tab-content" id="custom-tabs-one-tabContent">
                         <div class="tab-pane fade show active" id="custom-tabs-one-home" role="tabpanel" aria-labelledby="custom-tabs-one-home-tab">
-                            <div id="source_graph" ></div>
-                        </div>
-                        <div class="tab-pane fade" id="custom-tabs-one-profile" role="tabpanel" aria-labelledby="custom-tabs-one-profile-tab">
-                            <div id="target_graph" ></div>
-                        </div>
-                        <div class="tab-pane fade" id="custom-tabs-one-messages" role="tabpanel" aria-labelledby="custom-tabs-one-messages-tab">
-                            <div id="diff_graph" ></div>
+                            <div id="graph" ></div>
                         </div>
                     </div>
                 </div>
@@ -81,6 +69,14 @@
 <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/fontawesome-iconpicker/3.2.0/js/fontawesome-iconpicker.min.js" type="application/javascript"></script>
 <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/admin-lte/3.2.0/js/adminlte.min.js" type="application/javascript"></script>
 <script src="graph.js"></script>
-
+<script>
+    $(document).ready(() => {
+        const firstCard = document.getElementById('graph');
+        defaultWidth = firstCard.scrollWidth;
+        $.getJSON('graph.json',(data) => {
+            createGraph('graph',data);
+        });
+    })
+</script>
 </body>
 </html>

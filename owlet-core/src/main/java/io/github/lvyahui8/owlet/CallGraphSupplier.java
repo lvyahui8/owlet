@@ -6,12 +6,11 @@ import io.github.lvyahui8.owlet.graph.GraphConverter;
 import io.github.lvyahui8.owlet.graph.GraphSerializer;
 import io.github.lvyahui8.owlet.graph.MethodNode;
 import io.github.lvyahui8.owlet.utils.JavaUtils;
-import soot.PackManager;
-import soot.Scene;
-import soot.SceneTransformer;
-import soot.Transform;
+import soot.*;
+import soot.jimple.spark.SparkTransformer;
 import soot.jimple.toolkits.callgraph.CHATransformer;
 import soot.jimple.toolkits.callgraph.CallGraph;
+import soot.options.Options;
 
 import java.io.*;
 import java.util.*;
@@ -38,10 +37,35 @@ public class CallGraphSupplier implements Supplier<Graph> {
         this.classpath = classpath;
         load();
     }
+
+    public List<String> getJarFiles(String jarDirName) {
+        List<String> dirs = new LinkedList<>();
+        File jarDir = new File(jarDirName);
+        File[] files = jarDir.listFiles();
+        for (File f : files) {
+            if (f.getAbsolutePath().endsWith(".jar")) {
+                dirs.add(f.getAbsolutePath());
+            }
+        }
+        return dirs;
+    }
     public synchronized void load() {
+        // https://stackoverflow.com/questions/65982919/soot-not-finding-class-without-a-main-for-call-graph
         if (callGraph != null) {
             return;
         }
+        String mainClass =  "org.lyh.http.proxy.TesetServerMain";
+        String scp =  "C:\\Program Files\\Java\\jdk1.8.0_212\\jre\\lib\\rt.jar"
+                + File.pathSeparator + "C:\\Program Files\\Java\\jdk1.8.0_212\\jre\\lib\\jce.jar";
+
+        Options.v().set_soot_classpath(scp);
+        Options.v().set_process_dir(getJarFiles(classpath));
+        Options.v().set_whole_program(true);
+        Options.v().set_prepend_classpath(true);
+        Options.v().allow_phantom_refs();
+        Scene.v().loadNecessaryClasses();
+        SootClass mainClazz = Scene.v().getSootClass(mainClass);
+        Scene.v().setMainClass(mainClazz);
 
         PackManager.v().getPack("wjtp").add(new Transform("wjtp.getCallGraph", new SceneTransformer() {
             @Override
@@ -53,12 +77,30 @@ public class CallGraphSupplier implements Supplier<Graph> {
             }
         }));
 
-        soot.Main.main(Arrays.asList("-w",
-                "-pp",
-                "-process-dir",
-                classpath,
-                "-process-jar-dir",
-                classpath).toArray(new String[0]));
+        /*
+         * https://stackoverflow.com/questions/48620178/how-can-i-set-up-soot-when-using-it-as-a-library
+         * https://o2lab.github.io/710/p/a1.html
+         * https://github.com/soot-oss/soot/issues/1346
+         * https://mayuwan.github.io/2018/05/08/soot/
+         */
+        //Enable Spark
+        HashMap<String, String> opt = new HashMap<String, String>();
+        opt.put("on-fly-cg", "true");
+        SparkTransformer.v().transform("", opt);
+        PhaseOptions.v().setPhaseOption("cg.spark", "enabled:true");
+
+        PackManager.v().runPacks();
+//        soot.Main.main(Arrays.asList("-w",
+//                "-main-class",
+//               ,
+//                "-pp",
+//                "-cp",
+//             ,
+//                "-process-dir",
+//                classpath,
+//                "-process-jar-dir",
+//                classpath
+//                ).toArray(new String[0]));
 
     }
 

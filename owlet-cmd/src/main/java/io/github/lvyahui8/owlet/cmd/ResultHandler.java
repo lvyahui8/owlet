@@ -30,15 +30,15 @@ public class ResultHandler {
 
     public void output() throws IOException {
         File outputDir = new File("D:\\Temp\\output");
-        InputStream htmlStream = getClass().getClassLoader().getResourceAsStream("html/report.html");
+        InputStream htmlStream = getClass().getClassLoader().getResourceAsStream("html/graph.html");
         InputStream jsStream = getClass().getClassLoader().getResourceAsStream("html/graph.js");
         assert htmlStream != null;
         assert jsStream != null;
-        IOUtils.copy(htmlStream, Files.newOutputStream(new File(outputDir,"report.html").toPath()));
+        IOUtils.copy(htmlStream, Files.newOutputStream(new File(outputDir,"graph.html").toPath()));
         IOUtils.copy(jsStream, Files.newOutputStream(new File(outputDir,"graph.js").toPath()));
         IOUtils.write(convertToGraphJson(sourceGraph),Files.newOutputStream(new File(outputDir,"source.json").toPath()), Charsets.toCharset("UTF-8"));
         IOUtils.write(convertToGraphJson(targetGraph),Files.newOutputStream(new File(outputDir,"target.json").toPath()), Charsets.toCharset("UTF-8"));
-        IOUtils.write(convertToGraphJson(diffGraph),Files.newOutputStream(new File(outputDir,"diff.json").toPath()), Charsets.toCharset("UTF-8"));
+        IOUtils.write(convertToGraphJson(diffGraph),Files.newOutputStream(new File(outputDir,"graph.json").toPath()), Charsets.toCharset("UTF-8"));
     }
 
     public String convertToGraphJson(Graph graph) {
